@@ -46,7 +46,6 @@ to github and returns it."
                  :code code}
         rsp     (client/get github-access-token-url {:accept :json :query-params params})
         data    (json/read-str (:body rsp) :key-fn keyword)]
-    (println data)
     (:access_token data)))
 
 (defn get-user-repositories
@@ -102,6 +101,12 @@ nothing more."
   (-> (redirect "/login")
       (assoc :session {})))
 
+(defn logged-in-ctrl [{ session :session }]
+  (-> (some? (:identity session))
+      (str)
+      (response)
+      (content-type "application/json")))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Routes and Middlewares                           ;;
@@ -113,11 +118,13 @@ nothing more."
 ;; all authorization system is totally decoupled
 ;; from main routes.
 (defroutes app
-  (GET "/" [] home-ctrl)
+  (GET "/" [] (ring.util.response/resource-response "index.html" {:root "public"}))
+  (GET "/api/loggedIn" [] logged-in-ctrl)
   (GET "/repos" [] repos-ctrl)
   (GET "/login" [] login-ctrl)
   (GET "/authorize" [] authorize-ctrl)
-  (GET "/logout" [] logout-ctrl))
+  (GET "/logout" [] logout-ctrl)
+  (route/resources "/"))
 
 ;; User defined unauthorized handler. Is executed on each request that
 ;; is marked as unauthorized by any subsystem, like: access-rules system

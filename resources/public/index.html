@@ -1,0 +1,30 @@
+<html>
+  <head>
+    <title>Hello React</title>
+    <script src="/js/react-0.10.0.js"></script>
+    <script src="/js/jquery-1.10.0.min.js"></script>
+    <script src="/js/director.min.js"></script>
+  </head>
+  <body>
+    <div id="content"></div>
+    <script type="text/javascript">
+
+      var stage = document.getElementById('content')
+
+      var Hello = React.createClass({
+        displayName: 'Hello',
+        render: function() {
+          return React.DOM.div({}, 'Hello');
+        }
+      });
+
+      Router({
+
+        '/comments': function(){
+          React.renderComponent(Hello(), stage);
+        }
+
+      }).init();
+    </script>
+  </body>
+</html>
